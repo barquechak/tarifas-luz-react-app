@@ -6,6 +6,7 @@
   font-weight: bold;
   color: #333;
   word-wrap: break-word;
+  transition: opacity 0.3s ease-in-out; /* Smooth transition on time change */
 }
 
 /* Responsiveness for smaller devices */
@@ -13,9 +14,10 @@
   #current-time {
     font-size: 2rem; /* Smaller font for smaller screens */
   }
+}
 
-  #current-block {
-    font-size: 1rem; /* Adjust font size for small screens */
-    padding: 5px 10px;
+@media (max-width: 480px) {
+  #current-time {
+    font-size: 1.8rem; /* Adjust font size further for very small screens */
   }
 }
