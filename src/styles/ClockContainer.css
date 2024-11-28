@@ -1,0 +1,16 @@
+/* Clocks Container: Flex Layout */
+.clock-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.8); /* Slightly transparent background */
+
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 100%; /* Allow container to expand on smaller screens */
+  min-width: 250px; /* Ensure it doesn't get too small */
+  margin: 0 auto;
+}

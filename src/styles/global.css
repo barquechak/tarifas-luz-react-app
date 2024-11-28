@@ -1,0 +1,97 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  color: #333;
+  box-sizing: border-box; /* Ensures consistent box sizing */
+}
+
+/* Header Styles */
+header {
+  text-align: center;
+  padding: 15px;
+  background-color: #fff;
+  border-bottom: 2px solid #ddd;
+}
+
+h1 {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+/* Time Info */
+.time-info-valle,
+.time-info-punta,
+.time-info-nocturno {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 10px;
+  border: 3px solid;
+}
+
+.time-info-valle {
+  border-color: orange;
+}
+
+.time-info-punta {
+  border-color: red;
+}
+
+.time-info-nocturno {
+  border-color: green;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .chart-container {
+    padding: 10px;
+  }
+
+  .digital-clock-container,
+  .analog-clock-container {
+    max-width: 100%; /* Ensure clocks take up full width on smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.2rem;
+    margin-bottom: 15px; /* Adjust margin for smaller screens */
+  }
+
+  .card {
+    font-size: 0.8rem;
+    padding: 10px;
+  }
+
+  .tariff {
+    font-size: 1rem;
+  }
+
+  /* Cards container tweaks for ultra-small screens */
+  .cards-container {
+    gap: 10px;
+  }
+
+  .card-header {
+    font-size: 1rem;
+  }
+
+  .card h2 {
+    font-size: 1.2rem;
+  }
+}

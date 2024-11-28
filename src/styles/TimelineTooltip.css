@@ -1,0 +1,65 @@
+/* Universal box-sizing */
+* {
+  box-sizing: border-box;
+}
+
+/* Tooltip container position */
+.tooltip-container {
+  position: fixed; /* Fixed positioning to avoid overlapping issues */
+  z-index: 1000;
+  transform: translate(
+    -50%,
+    -100%
+  ); /* Center horizontally and move above the block */
+  pointer-events: none; /* Prevent blocking interactions */
+}
+
+/* Individual timeline block */
+.timeline-block {
+  position: relative;
+}
+
+/* Tooltip styling */
+.custom-tooltip {
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+  max-width: 200px; /* Limit tooltip size */
+}
+
+/* Tooltip square styles */
+.tooltip-square {
+  display: inline-block;
+  width: 15px; /* Enforce fixed size for the square */
+  height: 15px; /* Enforce fixed height */
+  margin-right: 8px; /* Space between square and text */
+  border: 1px solid white; /* Border around the square */
+  background-color: inherit; /* Ensure the color is applied correctly */
+  flex-shrink: 0; /* Prevents the square from stretching */
+  border-radius: 3px; /* Optional: Adds a small radius to make it cleaner */
+}
+
+/* Flexbox container to align square and text */
+.color-tariff-container {
+  display: inline-flex; /* Change from flex to inline-flex for proper alignment */
+  align-items: center; /* Align square and text vertically */
+  font-weight: 700;
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+}
+
+/* Styling for period text in the tooltip */
+.hour-period-container {
+  font-weight: 900;
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+}
+
+/* For debugging: Temporary borders to inspect */
+.tooltip-square {
+  border: 2px solid red !important; /* Make the square border visible */
+}

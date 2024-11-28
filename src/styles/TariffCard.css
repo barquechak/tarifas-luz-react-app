@@ -1,0 +1,98 @@
+/* Individual Card Style */
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  text-align: center;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Added hover effects */
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  border-radius: 8px 8px 0 0;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.card h2 {
+  margin: 20px 0 10px;
+  font-size: 1.4rem;
+}
+
+.tariff {
+  margin-top: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .card h2 {
+    font-size: 1.2rem; /* Smaller title font size on mobile */
+  }
+
+  .tariff {
+    font-size: 1.3rem; /* Slightly smaller tariff text */
+  }
+
+  .time-info-valle,
+  .time-info-punta,
+  .time-info-nocturno {
+    font-size: 1rem; /* Smaller font size for time info on mobile */
+  }
+}
+
+/* Card Header Colors */
+.card.red .card-header {
+  background-color: red;
+}
+
+.card.orange .card-header {
+  background-color: orange;
+}
+
+.card.green .card-header {
+  background-color: green;
+}
+
+/* Time Info */
+.time-info-valle,
+.time-info-punta,
+.time-info-nocturno {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 10px;
+  border: 3px solid;
+}
+
+.time-info-valle {
+  border-color: orange;
+}
+
+.time-info-punta {
+  border-color: red;
+}
+
+.time-info-nocturno {
+  border-color: green;
+}
+
+/* Responsive adjustments for Time Info */
+@media (max-width: 768px) {
+  .time-info-valle,
+  .time-info-punta,
+  .time-info-nocturno {
+    font-size: 1rem; /* Adjust time info font size for mobile */
+    padding: 8px; /* Reduce padding on smaller screens */
+  }
+}

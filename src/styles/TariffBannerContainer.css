@@ -1,0 +1,34 @@
+/* Styling the current block container */
+#current-block {
+  background: #f4f4f4;
+  padding: 8px 15px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  display: block;
+  width: 100%; /* Make the block container fill the parent width */
+  max-width: 300px; /* Max width for large screens */
+  text-align: center;
+}
+
+/* Styling for each color block */
+#current-block.red {
+  background: red;
+}
+
+#current-block.orange {
+  background: orange;
+}
+
+#current-block.green {
+  background: green;
+}
+
+/* Responsiveness for smaller devices */
+@media (max-width: 768px) {
+  #current-block {
+    font-size: 1rem; /* Adjust font size for small screens */
+    padding: 5px 10px;
+  }
+}

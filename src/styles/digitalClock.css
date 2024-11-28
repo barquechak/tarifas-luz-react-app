@@ -1,0 +1,21 @@
+/* Styling the current time */
+#current-time {
+  font-size: 3rem; /* Larger font for better visibility */
+  margin-bottom: 10px;
+  margin-top: 20px;
+  font-weight: bold;
+  color: #333;
+  word-wrap: break-word;
+}
+
+/* Responsiveness for smaller devices */
+@media (max-width: 768px) {
+  #current-time {
+    font-size: 2rem; /* Smaller font for smaller screens */
+  }
+
+  #current-block {
+    font-size: 1rem; /* Adjust font size for small screens */
+    padding: 5px 10px;
+  }
+}
