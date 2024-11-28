@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import "../styles/TariffBannerContainer.css";
 
 const TariffBannerContainer: React.FC = () => {
-  const [currentBlock, setCurrentBlock] = useState<{
-    name: string;
-    color: string;
-    start: string;
-    end: string;
-  } | null>(null); // Initialize with null
+  const [currentBlock, setCurrentBlock] = useState({
+    name: "Cargando...", // Default message while loading
+    color: "gray", // Neutral color while loading
+  });
 
   const now = new Date();
   const timeBlocksDigital = [
@@ -65,8 +63,8 @@ const TariffBannerContainer: React.FC = () => {
   }
 
   return (
-    <span id="current-block" className={currentBlock ? currentBlock.color : ""}>
-      {`Actualmente: ${currentBlock ? currentBlock.name : null}`}
+    <span id="current-block" className={`${currentBlock.color} fade-in`}>
+      {`Actualmente: ${currentBlock.name}`}
     </span>
   );
 };

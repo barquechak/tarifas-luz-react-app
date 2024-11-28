@@ -10,9 +10,11 @@
   width: 100%; /* Make the block container fill the parent width */
   max-width: 300px; /* Max width for large screens */
   text-align: center;
+  opacity: 0; /* Start invisible */
+  animation: fadeIn 1s forwards; /* Apply fade-in animation */
 }
 
-/* Styling for each color block */
+/* Color styling for each block */
 #current-block.red {
   background: red;
 }
@@ -25,10 +27,22 @@
   background: green;
 }
 
-/* Responsiveness for smaller devices */
+/* Fade-in animation for smooth transition */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive text size */
 @media (max-width: 768px) {
   #current-block {
     font-size: 1rem; /* Adjust font size for small screens */
     padding: 5px 10px;
   }
+}
+
+/* For better accessibility, color-adjustment */
+#current-block.gray {
+  background: #dcdcdc; /* Neutral color while loading */
 }
