@@ -61,8 +61,7 @@ h1 {
     padding: 10px;
   }
 
-  .digital-clock-container,
-  .analog-clock-container {
+  .digital-clock-container {
     max-width: 100%; /* Ensure clocks take up full width on smaller screens */
   }
 }

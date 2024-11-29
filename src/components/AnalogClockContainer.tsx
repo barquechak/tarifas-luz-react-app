@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
 import "../styles/AnalogClockContainer.css";
 
 // Time blocks with updated colors
@@ -53,12 +53,22 @@ function getCurrentBlock(now: Date) {
   return null;
 }
 
+function debounce(func: Function, wait: number) {
+  let timeout: ReturnType<typeof setTimeout>;
+  return (...args: any[]) => {
+    if (timeout) clearTimeout(timeout); // Clear previous timeout
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
+
 const AnalogClock: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const clockRef = useRef<HTMLDivElement>(null); // Ref for the clock div
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const radiusRef = useRef<number>(0);
   const prevBlockRef = useRef<{ color: string } | null>(null);
 
+  const [currentTime, setCurrentTime] = useState<Date>(new Date()); // State for current time
   const [shouldRedrawStatic, setShouldRedrawStatic] = useState(true); // State to track static redraw
 
   // Function to draw static elements (face, glow, numbers)
@@ -78,15 +88,19 @@ const AnalogClock: React.FC = () => {
 
   // Update clock border color only if the block changes
   const updateClockBorderColor = (currentBlock: { color: string } | null) => {
-    const clockElement = document.getElementById("analogClock");
-    if (clockElement && currentBlock !== prevBlockRef.current) {
-      let newColor = currentBlock ? currentBlock.color : "#333"; // Default color
-      clockElement.style.setProperty(
+    if (
+      clockRef.current &&
+      canvasRef.current &&
+      currentBlock !== prevBlockRef.current
+    ) {
+      const newColor = currentBlock ? currentBlock.color : "#333"; // Default color
+
+      canvasRef.current.style.setProperty(
         "border",
         `6px solid ${darkenBlockColor(newColor, 0.4)}`,
         "important"
       );
-      prevBlockRef.current = currentBlock; // Update the ref
+      prevBlockRef.current = currentBlock;
       setShouldRedrawStatic(true); // Trigger static elements redraw when block changes
     }
   };
@@ -120,21 +134,12 @@ const AnalogClock: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const handleResize = debounce(() => resizeCanvas(), 100);
+  useLayoutEffect(() => {
+    const handleResize = debounce(resizeCanvas, 100); // debounce the resize function
     window.addEventListener("resize", handleResize);
-
     resizeCanvas(); // Initial setup
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  function debounce(func: Function, wait: number) {
-    let timeout: ReturnType<typeof setTimeout>;
-    return (...args: any[]) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
-    };
-  }
 
   // Function to draw the glow effect around the entire clock
   const drawGlow = (ctx: CanvasRenderingContext2D | null, radius: number) => {
@@ -194,7 +199,7 @@ const AnalogClock: React.FC = () => {
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
     for (let num = 1; num < 13; num++) {
-      let ang = (num * Math.PI) / 6;
+      const ang = (num * Math.PI) / 6;
       ctx.rotate(ang);
       ctx.translate(0, -radius * 0.85);
       ctx.rotate(-ang);
@@ -265,45 +270,47 @@ const AnalogClock: React.FC = () => {
     if (ctx) {
       ctx.clearRect(-radius, -radius, 2 * radius, 2 * radius); // Clear canvas
 
+      const now = new Date();
       const currentBlock = getCurrentBlock(new Date());
       const borderColor = currentBlock ? currentBlock.color : "#333";
       updateClockBorderColor(currentBlock); // Update the border color if the block changes
 
       // Draw static elements (face, glow, numbers) once
-      //drawFace(ctx, radius, borderColor);
-      //drawGlow(ctx, radius);
-      //drawNumbers(ctx, radius);
       drawStaticElements(ctx, radius, borderColor);
 
       // Draw dynamic elements (the clock hands)
       drawTime(ctx, radius, borderColor); // Draw the hands
 
+      setCurrentTime(now); // Update time for ARIA updates
       // Continue the animation loop
       requestAnimationFrame(drawClock);
     }
   };
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      ctxRef.current = canvas.getContext("2d");
-      resizeCanvas();
-      window.addEventListener("resize", resizeCanvas);
-
-      // Start the clock drawing process
-      drawClock();
-
-      return () => {
-        window.removeEventListener("resize", resizeCanvas);
-      };
-    }
-  }, []); // Only run once when the component is mounted
+    drawClock(); // Start the animation loop
+  }, []);
 
   return (
-    <div className="analog-clock-container">
+    <div
+      ref={clockRef} // Attach the ref to the clock container
+      className="analog-clock-container"
+      role="group"
+      aria-labelledby="clock-label"
+      aria-live="polite"
+    >
+      <span id="clock-label" className="visually-hidden">
+        Analog clock displaying the current time.
+      </span>
+      <span aria-live="polite" className="visually-hidden">
+        {`Current time: ${currentTime.toLocaleTimeString()}. Current rate: ${
+          getCurrentBlock(currentTime)?.name ?? "Unknown"
+        }.`}
+      </span>
       <canvas
         id="analogClock"
         ref={canvasRef}
+        aria-hidden="true" // Mark canvas as hidden because it's a visual-only representation
         className="no-darkreader"
         width={400}
         height={400}

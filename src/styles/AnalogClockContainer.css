@@ -8,6 +8,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  will-change: transform, border; /* Hint for better rendering performance */
+  transition: width 0.3s ease; /* Smooth resizing transition */
+  transition: max-width 0.5s linear; /* Adjust the timing and easing for a smoother transition */
 }
 
 /* Analog Clock Styles */
@@ -18,16 +21,29 @@
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Improved shadow for depth */
   background: radial-gradient(circle, #000, #333); /* Darker gradient */
-  transition: all 0.3s ease;
+  transition: border 0.3s ease; /* Limit transition to border */
 }
 
 canvas.no-darkreader {
   filter: none !important;
 }
 
+/* Visually hidden for accessibility */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
 @media (max-width: 768px) {
   .analog-clock-container {
-    max-width: 200px;
-    min-width: 100px;
+    max-width: 200px; /* Set max-width for smaller screens */
+    min-width: 100px; /* Ensure readability */
+    width: 100%; /* Allow it to grow/shrink based on container */
   }
 }
