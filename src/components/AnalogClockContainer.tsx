@@ -1,31 +1,31 @@
 import React, { useRef, useEffect } from "react";
-import "../styles/analogClock.css";
+import "../styles/AnalogClockContainer.css";
 
 // Time blocks with updated colors
 const timeBlocks = [
-  { name: "₡28.30 por kWh", color: "green", start: "20:01", end: "06:00" }, // Green
-  { name: "₡67.65 por kWh", color: "orange", start: "06:01", end: "10:00" }, // Orange
-  { name: "₡165.01 por kWh", color: "red", start: "10:01", end: "12:30" }, // Red
-  { name: "₡67.65 por kWh", color: "orange", start: "12:31", end: "17:30" }, // Orange
-  { name: "₡165.01 por kWh", color: "red", start: "17:31", end: "20:00" }, // Red
+  { name: "₡28.30 por kWh", color: "green", start: "20:01", end: "06:00" },
+  { name: "₡67.65 por kWh", color: "orange", start: "06:01", end: "10:00" },
+  { name: "₡165.01 por kWh", color: "red", start: "10:01", end: "12:30" },
+  { name: "₡67.65 por kWh", color: "orange", start: "12:31", end: "17:30" },
+  { name: "₡165.01 por kWh", color: "red", start: "17:31", end: "20:00" },
 ];
 
 // Utility function to darken a color
-function darkenBlockColor(color: string) {
-  return `dark${color}`;
-}
+function darkenBlockColor(color: string, amount = 0.3): string {
+  const colorMap: { [key: string]: string } = {
+    green: `rgb(0, 128, 0)`,
+    orange: `rgb(255, 165, 0)`,
+    red: `rgb(255, 0, 0)`,
+  };
+  const [r, g, b] = colorMap[color]
+    .replace(/[^\d,]/g, "")
+    .split(",")
+    .map(Number);
 
-// Function to update the border color dynamically
-function updateClockBorderColor(currentBlock: { color: string } | null) {
-  const clockElement = document.getElementById("analogClock");
-  if (clockElement) {
-    let newColor = currentBlock ? currentBlock.color : "#333"; // Default color
-    clockElement.style.setProperty(
-      "border",
-      `6px solid ${darkenBlockColor(newColor)}`,
-      "important"
-    );
-  }
+  return `rgb(${Math.max(0, r - r * amount)}, ${Math.max(
+    0,
+    g - g * amount
+  )}, ${Math.max(0, b - b * amount)})`;
 }
 
 // Function to determine the current block
@@ -57,6 +57,21 @@ const AnalogClock: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const radiusRef = useRef<number>(0);
+  const prevBlockRef = useRef<{ color: string } | null>(null);
+
+  // Update clock border color only if the block changes
+  const updateClockBorderColor = (currentBlock: { color: string } | null) => {
+    const clockElement = document.getElementById("analogClock");
+    if (clockElement && currentBlock !== prevBlockRef.current) {
+      let newColor = currentBlock ? currentBlock.color : "#333"; // Default color
+      clockElement.style.setProperty(
+        "border",
+        `6px solid ${darkenBlockColor(newColor, 0.4)}`,
+        "important"
+      );
+      prevBlockRef.current = currentBlock; // Update the ref
+    }
+  };
 
   // Adjust the canvas size dynamically
   const resizeCanvas = () => {
@@ -64,16 +79,38 @@ const AnalogClock: React.FC = () => {
     if (canvas) {
       const width = canvas.offsetWidth;
       const height = canvas.offsetHeight;
+
+      // Dynamically set width and height based on container size
       canvas.width = width;
       canvas.height = height;
-      radiusRef.current = height / 2;
+
+      radiusRef.current = Math.min(width, height) / 2; // Ensure the radius is based on the smaller dimension
+
       ctxRef.current?.resetTransform(); // Reset any previous transformations
       ctxRef.current?.translate(radiusRef.current, radiusRef.current); // Re-center after resize
     }
   };
 
+  useEffect(() => {
+    const handleResize = debounce(() => resizeCanvas(), 100);
+    window.addEventListener("resize", handleResize);
+
+    resizeCanvas(); // Initial setup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  function debounce(func: Function, wait: number) {
+    let timeout: ReturnType<typeof setTimeout>;
+    return (...args: any[]) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  }
+
   // Function to draw the glow effect around the entire clock
-  const drawGlow = (ctx: CanvasRenderingContext2D, radius: number) => {
+  const drawGlow = (ctx: CanvasRenderingContext2D | null, radius: number) => {
+    if (!ctx) return;
+
     const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
     grad.addColorStop(0, "rgba(255, 255, 255, 0.6)");
     grad.addColorStop(0.7, "rgba(255, 255, 255, 0.1)");
@@ -87,10 +124,11 @@ const AnalogClock: React.FC = () => {
 
   // Function to draw the clock face
   const drawFace = (
-    ctx: CanvasRenderingContext2D,
+    ctx: CanvasRenderingContext2D | null,
     radius: number,
     borderColor: string
   ) => {
+    if (!ctx) return;
     const grad = ctx.createRadialGradient(
       0,
       0,
@@ -118,7 +156,11 @@ const AnalogClock: React.FC = () => {
   };
 
   // Function to draw the numbers on the clock
-  const drawNumbers = (ctx: CanvasRenderingContext2D, radius: number) => {
+  const drawNumbers = (
+    ctx: CanvasRenderingContext2D | null,
+    radius: number
+  ) => {
+    if (!ctx) return;
     ctx.font = radius * 0.15 + "px arial";
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
@@ -143,7 +185,6 @@ const AnalogClock: React.FC = () => {
     width: number,
     color: string
   ) => {
-    // Draw the main hand
     ctx.beginPath();
     ctx.lineWidth = width;
     ctx.lineCap = "round";
@@ -153,17 +194,15 @@ const AnalogClock: React.FC = () => {
     ctx.strokeStyle = color;
     ctx.stroke();
 
-    // Draw the small center line (pivot point)
     const pivotLength = width * 0.4; // Adjust this for a better effect
     ctx.beginPath();
-    ctx.lineWidth = width * 0.3; // Thin line for the center
+    ctx.lineWidth = width * 0.3;
     ctx.moveTo(0, 0);
     ctx.lineTo(0, pivotLength);
     ctx.strokeStyle = color;
     ctx.stroke();
 
-    // Reset rotation to avoid affecting other elements
-    ctx.rotate(-pos);
+    ctx.rotate(-pos); // Reset rotation to avoid affecting other elements
   };
 
   // Function to draw the clock hands
@@ -172,10 +211,6 @@ const AnalogClock: React.FC = () => {
     radius: number,
     borderColor: string
   ) => {
-    drawFace(ctx, radius, borderColor);
-    drawNumbers(ctx, radius);
-    drawGlow(ctx, radius);
-
     const now = new Date();
     let hour = now.getHours();
     let minute = now.getMinutes();
@@ -185,13 +220,13 @@ const AnalogClock: React.FC = () => {
       ((hour % 12) * Math.PI) / 6 +
       (minute * Math.PI) / (6 * 60) +
       (second * Math.PI) / (360 * 60);
-    drawStylishHand(ctx, hour, radius * 0.5, radius * 0.1, borderColor); // Thicker hour hand
+    drawStylishHand(ctx, hour, radius * 0.5, radius * 0.1, borderColor); // Hour hand
 
     minute = (minute * Math.PI) / 30 + (second * Math.PI) / (30 * 60);
-    drawStylishHand(ctx, minute, radius * 0.8, radius * 0.07, borderColor); // Slightly thinner minute hand
+    drawStylishHand(ctx, minute, radius * 0.8, radius * 0.07, borderColor); // Minute hand
 
     second = (second * Math.PI) / 30;
-    drawStylishHand(ctx, second, radius * 0.9, radius * 0.02, "#ff0000"); // Thin second hand
+    drawStylishHand(ctx, second, radius * 0.9, radius * 0.02, "#ff0000"); // Second hand
   };
 
   // Draw the clock on the canvas
@@ -199,13 +234,21 @@ const AnalogClock: React.FC = () => {
     const ctx = ctxRef.current;
     const radius = radiusRef.current;
     if (ctx) {
-      ctx.clearRect(-radius, -radius, 2 * radius, 2 * radius);
+      ctx.clearRect(-radius, -radius, 2 * radius, 2 * radius); // Clear canvas
 
       const currentBlock = getCurrentBlock(new Date());
       const borderColor = currentBlock ? currentBlock.color : "#333";
-      updateClockBorderColor(currentBlock);
+      updateClockBorderColor(currentBlock); // Update the border color if the block changes
 
-      drawTime(ctx, radius, borderColor);
+      // Draw static elements (face, glow, numbers) once
+      drawFace(ctx, radius, borderColor);
+      drawGlow(ctx, radius);
+      drawNumbers(ctx, radius);
+
+      // Draw dynamic elements (the clock hands)
+      drawTime(ctx, radius, borderColor); // Draw the hands
+
+      // Continue the animation loop
       requestAnimationFrame(drawClock);
     }
   };
@@ -217,22 +260,23 @@ const AnalogClock: React.FC = () => {
       resizeCanvas();
       window.addEventListener("resize", resizeCanvas);
 
-      drawClock(); // Start the clock
+      // Start the clock drawing process
+      drawClock();
 
       return () => {
         window.removeEventListener("resize", resizeCanvas);
       };
     }
-  }, []);
+  }, []); // Only run once when the component is mounted
 
   return (
     <div className="analog-clock-container">
       <canvas
         id="analogClock"
         ref={canvasRef}
-        width="400"
-        height="400"
         className="no-darkreader"
+        width={400}
+        height={400}
       />
     </div>
   );

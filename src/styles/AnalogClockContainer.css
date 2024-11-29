@@ -1,0 +1,33 @@
+/* Responsive Container for the Analog Clock */
+.analog-clock-container {
+  width: 100%;
+  max-width: 300px; /* Increased for larger screens */
+  min-width: 120px; /* Increased for readability */
+  height: auto;
+  aspect-ratio: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Analog Clock Styles */
+#analogClock {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Improved shadow for depth */
+  background: radial-gradient(circle, #000, #333); /* Darker gradient */
+  transition: all 0.3s ease;
+}
+
+canvas.no-darkreader {
+  filter: none !important;
+}
+
+@media (max-width: 768px) {
+  .analog-clock-container {
+    max-width: 200px;
+    min-width: 100px;
+  }
+}
