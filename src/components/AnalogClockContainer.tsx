@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import "../styles/AnalogClockContainer.css";
 
 // Time blocks with updated colors
@@ -59,6 +59,23 @@ const AnalogClock: React.FC = () => {
   const radiusRef = useRef<number>(0);
   const prevBlockRef = useRef<{ color: string } | null>(null);
 
+  const [shouldRedrawStatic, setShouldRedrawStatic] = useState(true); // State to track static redraw
+
+  // Function to draw static elements (face, glow, numbers)
+  const drawStaticElements = (
+    ctx: CanvasRenderingContext2D | null,
+    radius: number,
+    borderColor: string
+  ) => {
+    if (!ctx || !shouldRedrawStatic) return;
+
+    drawFace(ctx, radius, borderColor);
+    drawGlow(ctx, radius);
+    drawNumbers(ctx, radius);
+
+    setShouldRedrawStatic(false); // Set to false after drawing static elements
+  };
+
   // Update clock border color only if the block changes
   const updateClockBorderColor = (currentBlock: { color: string } | null) => {
     const clockElement = document.getElementById("analogClock");
@@ -70,6 +87,7 @@ const AnalogClock: React.FC = () => {
         "important"
       );
       prevBlockRef.current = currentBlock; // Update the ref
+      setShouldRedrawStatic(true); // Trigger static elements redraw when block changes
     }
   };
 
@@ -80,14 +98,25 @@ const AnalogClock: React.FC = () => {
       const width = canvas.offsetWidth;
       const height = canvas.offsetHeight;
 
-      // Dynamically set width and height based on container size
-      canvas.width = width;
-      canvas.height = height;
+      // Check if the size has actually changed
+      if (canvas.width !== width || canvas.height !== height) {
+        // Set the new canvas size
+        canvas.width = width;
+        canvas.height = height;
 
-      radiusRef.current = Math.min(width, height) / 2; // Ensure the radius is based on the smaller dimension
+        // Update the radius based on the new size
+        radiusRef.current = Math.min(width, height) / 2;
 
-      ctxRef.current?.resetTransform(); // Reset any previous transformations
-      ctxRef.current?.translate(radiusRef.current, radiusRef.current); // Re-center after resize
+        // Get the 2D rendering context and reset transformations
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.resetTransform(); // Reset any previous transformations
+          ctx.translate(radiusRef.current, radiusRef.current); // Center the drawing context
+          ctxRef.current = ctx; // Update the context reference
+        }
+
+        setShouldRedrawStatic(true); // Trigger static elements redraw
+      }
     }
   };
 
@@ -241,9 +270,10 @@ const AnalogClock: React.FC = () => {
       updateClockBorderColor(currentBlock); // Update the border color if the block changes
 
       // Draw static elements (face, glow, numbers) once
-      drawFace(ctx, radius, borderColor);
-      drawGlow(ctx, radius);
-      drawNumbers(ctx, radius);
+      //drawFace(ctx, radius, borderColor);
+      //drawGlow(ctx, radius);
+      //drawNumbers(ctx, radius);
+      drawStaticElements(ctx, radius, borderColor);
 
       // Draw dynamic elements (the clock hands)
       drawTime(ctx, radius, borderColor); // Draw the hands
